@@ -88,7 +88,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /** Tests for the {@link LocalInputChannel}. */
-@State(Scope.Benchmark)
 public class LocalInputChannelTest {
 
     @Test
