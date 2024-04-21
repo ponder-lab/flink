@@ -91,7 +91,7 @@ import org.openjdk.jmh.annotations.*;
 
 /** Tests for the {@link LocalInputChannel}. */
 @State(Scope.Benchmark)
-class LocalInputChannelTest {
+public class LocalInputChannelTest {
 
     @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
     private int parallelism;
