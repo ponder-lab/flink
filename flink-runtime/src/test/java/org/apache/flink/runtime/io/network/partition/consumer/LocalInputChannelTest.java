@@ -138,7 +138,7 @@ public class LocalInputChannelTest {
      */
     @Test
     @Benchmark
-    void testConcurrentConsumeMultiplePartitions() throws Exception {
+    public void testConcurrentConsumeMultiplePartitions() throws Exception {
         // Config
         final int producerBufferPoolSize = parallelism + 1;
         final int numberOfBuffersPerChannel = 1024;
