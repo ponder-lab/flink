@@ -52,6 +52,7 @@ under the License.
 			AsynchronousFileIOChannelTest
 			-->--add-opens=java.base/java.util.concurrent=ALL-UNNAMED
 		</surefire.module.config>
+		<jmh.version>1.37</jmh.version>
 	</properties>
 
 	<dependencies>
@@ -317,6 +318,19 @@ under the License.
 			<artifactId>powermock-api-mockito2</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.openjdk.jmh</groupId>
+		    <artifactId>jmh-core</artifactId>
+		    <version>${jmh.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.openjdk.jmh</groupId>
+		    <artifactId>jmh-generator-annprocess</artifactId>
+		    <version>${jmh.version}</version>
+		    <scope>provided</scope>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
@@ -424,6 +438,26 @@ under the License.
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+						    <finalName>${uberjar.name}</finalName>
+							<transformers>
+							    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+								<mainClass>org.openjdk.jmh.Main</mainClass>
+							    </transformer>
+							</transformers>
+							<filters>
+							    <filter>
+								<!--
+								    Shading signed JARs will fail without this.
+								    http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+								-->
+								<artifact>*:*</artifact>
+								<excludes>
+								    <exclude>META-INF/*.SF</exclude>
+								    <exclude>META-INF/*.DSA</exclude>
+							     	    <exclude>META-INF/*.RSA</exclude>
+								</excludes>
+							    </filter>
+							</filters>
 							<artifactSet>
 								<includes>
 									<include>io.airlift:aircompressor</include>
@@ -441,6 +475,56 @@ under the License.
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+				    <execution>
+				        <id>run-benchmarks</id>
+				        <phase>integration-test</phase>
+				        <goals>
+				            <goal>exec</goal>
+				        </goals>
+				        <configuration>
+				            <classpathScope>test</classpathScope>
+				            <executable>java</executable>
+				            <arguments>
+				                <argument>-classpath</argument>
+				                <classpath />
+				                <argument>org.openjdk.jmh.Main</argument>
+				                <argument>.*</argument>
+				                <!-- Measurement mode. -->
+				                <argument>-bm</argument>
+				                <argument>avgt,thrpt</argument>
+				                <!-- Forks. -->
+				                <argument>-f</argument>
+				                <argument>1</argument>
+				                <!-- Units. -->
+				                <argument>-tu</argument>
+				                <argument>ms</argument>
+				                <!-- Machine-readible output. -->
+				                <argument>-rff</argument>
+				                <argument>jmh-results.csv</argument>
+				                <!-- Human-readable output. -->
+				                <argument>-o</argument>
+				                <argument>jmh-results.txt</argument>
+				                <!-- Fail on error. -->
+				                <argument>-foe</argument>
+				                <argument>true</argument>
+				                <!-- Iterations. -->
+				                <!-- <argument>-i</argument> -->
+				                <!-- <argument>1</argument> -->
+				                <!-- Warmup. -->
+				                <argument>-wi</argument>
+				                <argument>1</argument>
+				                <!-- Warmup mode. -->
+				                <!-- <argument>-wm</argument> -->
+				                <!-- <argument>BULK</argument> -->
+				            </arguments>
+				        </configuration>
+				    </execution>
+				</executions>
+			    </plugin>
 		</plugins>
 	</build>
 
