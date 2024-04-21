@@ -87,8 +87,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.openjdk.jmh.annotations.*;
+
 /** Tests for the {@link LocalInputChannel}. */
+@State(Scope.Benchmark)
 class LocalInputChannelTest {
+
+    @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
+    private int parallelism;
 
     @Test
     void testNoDataPersistedAfterReceivingAlignedBarrier() throws Exception {
@@ -131,9 +137,9 @@ class LocalInputChannelTest {
      * via local input channels.
      */
     @Test
+    @Benchmark
     void testConcurrentConsumeMultiplePartitions() throws Exception {
         // Config
-        final int parallelism = 32;
         final int producerBufferPoolSize = parallelism + 1;
         final int numberOfBuffersPerChannel = 1024;
 
