@@ -60,11 +60,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.openjdk.jmh.annotations.*;
+
 /**
  * This class tests the functionality of the {@link LocalFileSystem} class in its components. In
  * particular, file/directory access, creation, deletion, read, write is tested.
  */
+@State(Scope.Benchmark)
 public class LocalFileSystemTest extends TestLogger {
+
+    @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
+    private int concurrentOperations;
 
     @Rule public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -295,11 +301,11 @@ public class LocalFileSystemTest extends TestLogger {
     }
 
     @Test
+    @Benchmark
     public void testConcurrentMkdirs() throws Exception {
         final FileSystem fs = FileSystem.getLocalFileSystem();
         final File root = temporaryFolder.getRoot();
         final int directoryDepth = 10;
-        final int concurrentOperations = 10;
 
         final Collection<File> targetDirectories =
                 createTargetDirectories(root, directoryDepth, concurrentOperations);
