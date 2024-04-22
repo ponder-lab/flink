@@ -92,7 +92,7 @@ public class SortMergeResultPartitionTest {
 
     @BeforeEach
     @Setup(Level.Iteration)
-    void setUp() throws IOException {
+    public void setUp() throws IOException {
         fileChannelManager =
                 new FileChannelManagerImpl(
                         new String[] {TempDirUtils.newFolder(tmpFolder).toString()}, "testing");
@@ -103,7 +103,7 @@ public class SortMergeResultPartitionTest {
 
     @AfterEach
     @TearDown(Level.Iteration)
-    void shutdown() throws Exception {
+    public void shutdown() throws Exception {
         fileChannelManager.close();
         globalPool.destroy();
         readBufferPool.destroy();
