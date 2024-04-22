@@ -88,7 +88,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /** Tests for the {@link LocalInputChannel}. */
-public class LocalInputChannelTest {
+class LocalInputChannelTest {
 
     @Test
     void testNoDataPersistedAfterReceivingAlignedBarrier() throws Exception {
