@@ -60,9 +60,12 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.openjdk.jmh.annotations.*;
+
 /** Tests for {@link SortMergeResultPartition}. */
 @ExtendWith(ParameterizedTestExtension.class)
-class SortMergeResultPartitionTest {
+@State(Scope.Benchmark)
+public class SortMergeResultPartitionTest {
 
     private static final int bufferSize = 1024;
 
@@ -70,7 +73,8 @@ class SortMergeResultPartitionTest {
 
     private static final int totalBytes = 32 * 1024 * 1024;
 
-    private static final int numThreads = 4;
+    @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
+    private static final int numThreads;
 
     @Parameter public boolean useHashDataBuffer;
 
@@ -87,6 +91,7 @@ class SortMergeResultPartitionTest {
     @TempDir private Path tmpFolder;
 
     @BeforeEach
+    @Setup(Level.Iteration)
     void setUp() throws IOException {
         fileChannelManager =
                 new FileChannelManagerImpl(
@@ -97,6 +102,7 @@ class SortMergeResultPartitionTest {
     }
 
     @AfterEach
+    @TearDown(Level.Iteration)
     void shutdown() throws Exception {
         fileChannelManager.close();
         globalPool.destroy();
@@ -110,7 +116,8 @@ class SortMergeResultPartitionTest {
     }
 
     @TestTemplate
-    void testWriteAndRead() throws Exception {
+    @Benchmark
+    public void testWriteAndRead() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
         int numSubpartitions = 10;
         int numRecords = 1000;
