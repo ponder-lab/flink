@@ -714,21 +714,21 @@ public class BlobCachePutTest {
 
     @Test
     @Benchmark
-    void testConcurrentPutOperationsNoJob()
+    public void testConcurrentPutOperationsNoJob()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(null, TRANSIENT_BLOB);
     }
 
     @Test
     @Benchmark
-    void testConcurrentPutOperationsForJob()
+    public void testConcurrentPutOperationsForJob()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(new JobID(), TRANSIENT_BLOB);
     }
 
     @Test
     @Benchmark
-    void testConcurrentPutOperationsForJobHa()
+    public void testConcurrentPutOperationsForJobHa()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(new JobID(), PERMANENT_BLOB);
     }
