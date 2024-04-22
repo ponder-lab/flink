@@ -72,11 +72,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.openjdk.jmh.annotations.*;
+
 /**
  * Tests for successful and failing PUT operations against the BLOB server, and successful GET
  * operations.
  */
-class BlobCachePutTest {
+ @State(Scope.Benchmark)
+public class BlobCachePutTest {
+
+    @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
+    private int concurrentPutOperations;
 
     @TempDir private java.nio.file.Path tempDir;
 
@@ -707,19 +713,22 @@ class BlobCachePutTest {
     }
 
     @Test
-    void testConcurrentPutOperationsNoJob()
+    @Benchmark
+    public void testConcurrentPutOperationsNoJob()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(null, TRANSIENT_BLOB);
     }
 
     @Test
-    void testConcurrentPutOperationsForJob()
+    @Benchmark
+    public void testConcurrentPutOperationsForJob()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(new JobID(), TRANSIENT_BLOB);
     }
 
     @Test
-    void testConcurrentPutOperationsForJobHa()
+    @Benchmark
+    public void testConcurrentPutOperationsForJobHa()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(new JobID(), PERMANENT_BLOB);
     }
@@ -731,14 +740,13 @@ class BlobCachePutTest {
      * @param jobId job ID to use (or <tt>null</tt> if job-unrelated)
      * @param blobType whether the BLOB should become permanent or transient
      */
-    private void testConcurrentPutOperations(
+    void testConcurrentPutOperations(
             @Nullable final JobID jobId, final BlobKey.BlobType blobType)
             throws IOException, InterruptedException, ExecutionException {
         final Configuration config = new Configuration();
         final BlobStore blobStoreServer = mock(BlobStore.class);
         final BlobStore blobStoreCache = mock(BlobStore.class);
 
-        int concurrentPutOperations = 2;
         int dataSize = 1024;
 
         final CountDownLatch countDownLatch = new CountDownLatch(concurrentPutOperations);
