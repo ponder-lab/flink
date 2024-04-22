@@ -78,7 +78,7 @@ import org.openjdk.jmh.annotations.*;
  * Tests for successful and failing PUT operations against the BLOB server, and successful GET
  * operations.
  */
-@State(Scope.Benchmark)
+ @State(Scope.Benchmark)
 public class BlobCachePutTest {
 
     @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
@@ -713,18 +713,21 @@ public class BlobCachePutTest {
     }
 
     @Test
+    @Benchmark
     void testConcurrentPutOperationsNoJob()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(null, TRANSIENT_BLOB);
     }
 
     @Test
+    @Benchmark
     void testConcurrentPutOperationsForJob()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(new JobID(), TRANSIENT_BLOB);
     }
 
     @Test
+    @Benchmark
     void testConcurrentPutOperationsForJobHa()
             throws IOException, ExecutionException, InterruptedException {
         testConcurrentPutOperations(new JobID(), PERMANENT_BLOB);
@@ -737,8 +740,7 @@ public class BlobCachePutTest {
      * @param jobId job ID to use (or <tt>null</tt> if job-unrelated)
      * @param blobType whether the BLOB should become permanent or transient
      */
-    @Benchmark
-    public void testConcurrentPutOperations(
+    void testConcurrentPutOperations(
             @Nullable final JobID jobId, final BlobKey.BlobType blobType)
             throws IOException, InterruptedException, ExecutionException {
         final Configuration config = new Configuration();
