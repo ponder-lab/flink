@@ -74,7 +74,7 @@ public class SortMergeResultPartitionTest {
     private static final int totalBytes = 32 * 1024 * 1024;
 
     @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
-    private static final int numThreads;
+    private static int numThreads;
 
     @Parameter public boolean useHashDataBuffer;
 
