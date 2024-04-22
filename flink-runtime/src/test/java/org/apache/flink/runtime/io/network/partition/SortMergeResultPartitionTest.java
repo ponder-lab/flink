@@ -90,7 +90,6 @@ public class SortMergeResultPartitionTest {
 
     @TempDir private Path tmpFolder;
 
-    @BeforeEach
     @Setup(Level.Iteration)
     public void setUp() throws IOException {
         fileChannelManager =
@@ -101,7 +100,6 @@ public class SortMergeResultPartitionTest {
         readIOExecutor = Executors.newFixedThreadPool(numThreads);
     }
 
-    @AfterEach
     @TearDown(Level.Iteration)
     public void shutdown() throws Exception {
         fileChannelManager.close();
@@ -115,7 +113,6 @@ public class SortMergeResultPartitionTest {
         return Arrays.asList(false, true);
     }
 
-    @TestTemplate
     @Benchmark
     public void testWriteAndRead() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
@@ -254,7 +251,6 @@ public class SortMergeResultPartitionTest {
         return views;
     }
 
-    @TestTemplate
     void testWriteLargeRecord() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
         BufferPool bufferPool = globalPool.createBufferPool(numBuffers, numBuffers, numBuffers);
@@ -292,7 +288,6 @@ public class SortMergeResultPartitionTest {
         assertThat(recordRead).isEqualTo(recordWritten);
     }
 
-    @TestTemplate
     void testDataBroadcast() throws Exception {
         int numSubpartitions = 10;
         int numBuffers = useHashDataBuffer ? 100 : 15;
@@ -329,7 +324,6 @@ public class SortMergeResultPartitionTest {
         assertThat(dataRead).isEqualTo(dataSize);
     }
 
-    @TestTemplate
     void testReleaseWhileWriting() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
 
@@ -352,7 +346,6 @@ public class SortMergeResultPartitionTest {
         assertThat(fileChannelManager.getPaths()[0].list().length).isEqualTo(0);
     }
 
-    @TestTemplate
     void testRelease() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
 
@@ -386,7 +379,6 @@ public class SortMergeResultPartitionTest {
         assertThat(checkNotNull(fileChannelManager.getPaths()[0].list()).length).isEqualTo(0);
     }
 
-    @TestTemplate
     void testCloseReleasesAllBuffers() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
 
@@ -403,7 +395,6 @@ public class SortMergeResultPartitionTest {
         assertThat(globalPool.getNumberOfAvailableMemorySegments()).isEqualTo(totalBuffers);
     }
 
-    @TestTemplate
     void testReadUnfinishedPartition() throws Exception {
         BufferPool bufferPool = globalPool.createBufferPool(10, 10, 10);
         SortMergeResultPartition partition = createSortMergedPartition(10, bufferPool);
@@ -415,7 +406,6 @@ public class SortMergeResultPartitionTest {
         bufferPool.lazyDestroy();
     }
 
-    @TestTemplate
     void testReadReleasedPartition() throws Exception {
         BufferPool bufferPool = globalPool.createBufferPool(10, 10, 10);
         SortMergeResultPartition partition = createSortMergedPartition(10, bufferPool);
@@ -430,17 +420,14 @@ public class SortMergeResultPartitionTest {
         bufferPool.lazyDestroy();
     }
 
-    @TestTemplate
     void testNumBytesProducedCounterForUnicast() throws IOException {
         testResultPartitionBytesCounter(false);
     }
 
-    @TestTemplate
     void testNumBytesProducedCounterForBroadcast() throws IOException {
         testResultPartitionBytesCounter(true);
     }
 
-    @TestTemplate
     void testNetworkBufferReservation() throws IOException {
         int numBuffers = 10;
 
@@ -452,7 +439,6 @@ public class SortMergeResultPartitionTest {
         partition.close();
     }
 
-    @TestTemplate
     void testNoDeadlockOnSpecificConsumptionOrder() throws Exception {
         // see https://issues.apache.org/jira/browse/FLINK-31386 for more information
         int numNetworkBuffers = 2 * BatchShuffleReadBufferPool.NUM_BYTES_PER_REQUEST / bufferSize;
