@@ -85,7 +85,9 @@ public class BlobCachePutTest {
     @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
     private int concurrentPutOperations;
 
-    private java.nio.file.Path tempDir = Files.createTempDirectory("temp");
+    try {
+        private java.nio.file.Path tempDir = Files.createTempDirectory("temp");
+    } catch(IOException e){}
 
     private final Random rnd = new Random();
 
