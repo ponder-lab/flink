@@ -85,9 +85,7 @@ public class BlobCachePutTest {
     @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
     private int concurrentPutOperations;
 
-    try {
-        private java.nio.file.Path tempDir = Files.createTempDirectory("temp");
-    } catch(IOException e){}
+    private java.nio.file.Path tempDir;
 
     private final Random rnd = new Random();
 
@@ -719,21 +717,30 @@ public class BlobCachePutTest {
     @Benchmark
     public void testConcurrentPutOperationsNoJob()
             throws IOException, ExecutionException, InterruptedException {
-        testConcurrentPutOperations(null, TRANSIENT_BLOB);
+        try {
+            tempDir = Files.createTempDirectory("temp");
+            testConcurrentPutOperations(null, TRANSIENT_BLOB);
+        } catch (IOException e){}
     }
 
     @Test
     @Benchmark
     public void testConcurrentPutOperationsForJob()
             throws IOException, ExecutionException, InterruptedException {
-        testConcurrentPutOperations(new JobID(), TRANSIENT_BLOB);
+        try {
+            tempDir = Files.createTempDirectory("temp");
+            testConcurrentPutOperations(new JobID(), TRANSIENT_BLOB);
+        } catch (IOException e){}
     }
 
     @Test
     @Benchmark
     public void testConcurrentPutOperationsForJobHa()
             throws IOException, ExecutionException, InterruptedException {
-        testConcurrentPutOperations(new JobID(), PERMANENT_BLOB);
+        try {
+            tempDir = Files.createTempDirectory("temp");
+            testConcurrentPutOperations(new JobID(), PERMANENT_BLOB);
+        } catch (IOException e){}
     }
 
     /**
