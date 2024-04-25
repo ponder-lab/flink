@@ -73,6 +73,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.openjdk.jmh.annotations.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Tests for successful and failing PUT operations against the BLOB server, and successful GET
@@ -84,7 +87,7 @@ public class BlobCachePutTest {
     @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
     private int concurrentPutOperations;
 
-    @TempDir private java.nio.file.Path tempDir;
+    private java.nio.file.Path tempDir = Files.createTempDirectory((Path) Paths.get("/"), "temp");
 
     private final Random rnd = new Random();
 
