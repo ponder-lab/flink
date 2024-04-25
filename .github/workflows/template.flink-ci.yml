@@ -283,13 +283,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jmh_results.txt
-          path: ./jmh_results.txt
+          path: ./flink-runtime/jmh_results.txt
 
       - name: "Upload jmh_results.csv"
         uses: actions/upload-artifact@v4
         with:
           name: jmh_results.csv
-          path: ./jmh_results.csv
+          path: ./flink-runtime/jmh_results.csv
 
       - name: "Save Docker images to cache"
         working-directory: ${{ env.CONTAINER_LOCAL_WORKING_DIR }}
