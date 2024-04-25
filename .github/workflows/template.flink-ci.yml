@@ -201,6 +201,9 @@ jobs:
             stringified-module-name: misc
 
     steps:
+      - name: "Run pwd"
+        run: pwd
+    
       - name: "Flink Checkout"
         uses: actions/checkout@v4
         with:
