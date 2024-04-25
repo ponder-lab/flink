@@ -117,7 +117,7 @@ public class SortMergeResultPartitionTest {
     public void testWriteAndRead() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
         int numSubpartitions = 10;
-        int numRecords = 1000;
+        int numRecords = 10000;
         Random random = new Random();
 
         BufferPool bufferPool = globalPool.createBufferPool(numBuffers, numBuffers, numBuffers);
