@@ -127,6 +127,6 @@ public class BlobServerOptions {
     public static final ConfigOption<Integer> CONNECT_TIMEOUT =
             key("blob.client.connect.timeout")
                     .intType()
-                    .defaultValue(0)
+                    .defaultValue(300_000)
                     .withDescription("The connection timeout in milliseconds for the blob client.");
 }
