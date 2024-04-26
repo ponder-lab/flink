@@ -60,9 +60,12 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.openjdk.jmh.annotations.*;
+
 /** Tests for {@link SortMergeResultPartition}. */
 @ExtendWith(ParameterizedTestExtension.class)
-class SortMergeResultPartitionTest {
+@State(Scope.Benchmark)
+public class SortMergeResultPartitionTest {
 
     private static final int bufferSize = 1024;
 
@@ -70,7 +73,8 @@ class SortMergeResultPartitionTest {
 
     private static final int totalBytes = 32 * 1024 * 1024;
 
-    private static final int numThreads = 4;
+    @Param({"10", "50", "100", "500", "1000", "5000", "10000"})
+    private static int numThreads;
 
     @Parameter public boolean useHashDataBuffer;
 
@@ -86,8 +90,8 @@ class SortMergeResultPartitionTest {
 
     @TempDir private Path tmpFolder;
 
-    @BeforeEach
-    void setUp() throws IOException {
+    @Setup(Level.Iteration)
+    public void setUp() throws IOException {
         fileChannelManager =
                 new FileChannelManagerImpl(
                         new String[] {TempDirUtils.newFolder(tmpFolder).toString()}, "testing");
@@ -96,8 +100,8 @@ class SortMergeResultPartitionTest {
         readIOExecutor = Executors.newFixedThreadPool(numThreads);
     }
 
-    @AfterEach
-    void shutdown() throws Exception {
+    @TearDown(Level.Iteration)
+    public void shutdown() throws Exception {
         fileChannelManager.close();
         globalPool.destroy();
         readBufferPool.destroy();
@@ -109,11 +113,11 @@ class SortMergeResultPartitionTest {
         return Arrays.asList(false, true);
     }
 
-    @TestTemplate
-    void testWriteAndRead() throws Exception {
+    @Benchmark
+    public void testWriteAndRead() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
         int numSubpartitions = 10;
-        int numRecords = 1000;
+        int numRecords = 10000;
         Random random = new Random();
 
         BufferPool bufferPool = globalPool.createBufferPool(numBuffers, numBuffers, numBuffers);
@@ -247,7 +251,6 @@ class SortMergeResultPartitionTest {
         return views;
     }
 
-    @TestTemplate
     void testWriteLargeRecord() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
         BufferPool bufferPool = globalPool.createBufferPool(numBuffers, numBuffers, numBuffers);
@@ -285,7 +288,6 @@ class SortMergeResultPartitionTest {
         assertThat(recordRead).isEqualTo(recordWritten);
     }
 
-    @TestTemplate
     void testDataBroadcast() throws Exception {
         int numSubpartitions = 10;
         int numBuffers = useHashDataBuffer ? 100 : 15;
@@ -322,7 +324,6 @@ class SortMergeResultPartitionTest {
         assertThat(dataRead).isEqualTo(dataSize);
     }
 
-    @TestTemplate
     void testReleaseWhileWriting() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
 
@@ -345,7 +346,6 @@ class SortMergeResultPartitionTest {
         assertThat(fileChannelManager.getPaths()[0].list().length).isEqualTo(0);
     }
 
-    @TestTemplate
     void testRelease() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
 
@@ -379,7 +379,6 @@ class SortMergeResultPartitionTest {
         assertThat(checkNotNull(fileChannelManager.getPaths()[0].list()).length).isEqualTo(0);
     }
 
-    @TestTemplate
     void testCloseReleasesAllBuffers() throws Exception {
         int numBuffers = useHashDataBuffer ? 100 : 15;
 
@@ -396,7 +395,6 @@ class SortMergeResultPartitionTest {
         assertThat(globalPool.getNumberOfAvailableMemorySegments()).isEqualTo(totalBuffers);
     }
 
-    @TestTemplate
     void testReadUnfinishedPartition() throws Exception {
         BufferPool bufferPool = globalPool.createBufferPool(10, 10, 10);
         SortMergeResultPartition partition = createSortMergedPartition(10, bufferPool);
@@ -408,7 +406,6 @@ class SortMergeResultPartitionTest {
         bufferPool.lazyDestroy();
     }
 
-    @TestTemplate
     void testReadReleasedPartition() throws Exception {
         BufferPool bufferPool = globalPool.createBufferPool(10, 10, 10);
         SortMergeResultPartition partition = createSortMergedPartition(10, bufferPool);
@@ -423,17 +420,14 @@ class SortMergeResultPartitionTest {
         bufferPool.lazyDestroy();
     }
 
-    @TestTemplate
     void testNumBytesProducedCounterForUnicast() throws IOException {
         testResultPartitionBytesCounter(false);
     }
 
-    @TestTemplate
     void testNumBytesProducedCounterForBroadcast() throws IOException {
         testResultPartitionBytesCounter(true);
     }
 
-    @TestTemplate
     void testNetworkBufferReservation() throws IOException {
         int numBuffers = 10;
 
@@ -445,7 +439,6 @@ class SortMergeResultPartitionTest {
         partition.close();
     }
 
-    @TestTemplate
     void testNoDeadlockOnSpecificConsumptionOrder() throws Exception {
         // see https://issues.apache.org/jira/browse/FLINK-31386 for more information
         int numNetworkBuffers = 2 * BatchShuffleReadBufferPool.NUM_BYTES_PER_REQUEST / bufferSize;
