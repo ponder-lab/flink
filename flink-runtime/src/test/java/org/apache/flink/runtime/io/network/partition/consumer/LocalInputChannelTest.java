@@ -87,8 +87,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.openjdk.jmh.annotations.*;
+
 /** Tests for the {@link LocalInputChannel}. */
-class LocalInputChannelTest {
+@State(Scope.Benchmark)
+public class LocalInputChannelTest {
+
+    @Param({"10", "20", "50", "100", "200", "500", "1000", "2000"})
+    private int parallelism;
 
     @Test
     void testNoDataPersistedAfterReceivingAlignedBarrier() throws Exception {
@@ -130,10 +136,10 @@ class LocalInputChannelTest {
      * <p>Multiple producer tasks produce pipelined partitions, which are consumed by multiple tasks
      * via local input channels.
      */
+    @Benchmark
     @Test
-    void testConcurrentConsumeMultiplePartitions() throws Exception {
+    public void testConcurrentConsumeMultiplePartitions() throws Exception {
         // Config
-        final int parallelism = 32;
         final int producerBufferPoolSize = parallelism + 1;
         final int numberOfBuffersPerChannel = 1024;
 
